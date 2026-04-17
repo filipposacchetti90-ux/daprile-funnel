@@ -48,8 +48,10 @@ export default function VSLPage() {
           >
             {/* Headline — compact on mobile */}
             <h1 className="text-3xl md:text-4xl leading-[1.2] text-white mb-2 md:mb-3 font-bold tracking-tight">
-              E se il caff&egrave; di{" "}
-              <span className="italic">&ldquo;qualit&agrave;&rdquo;</span>{" "}
+              <span className="block md:inline">
+                E se il caff&egrave; di{" "}
+                <span className="italic">&ldquo;qualit&agrave;&rdquo;</span>
+              </span>{" "}
               che stai bevendo fosse una{" "}
               <span className="text-brand-red">miscela industriale</span>?
             </h1>
