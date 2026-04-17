@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { trackViewContent } from "../lib/pixel";
 import Header from "../components/Header";
-import VideoPlayer from "../components/VideoPlayer";
+import VslPlayer from "../components/VslPlayer";
 import SocialProof from "../components/SocialProof";
 import CountdownTimer from "../components/CountdownTimer";
 import CTASection from "../components/CTASection";
@@ -14,12 +14,20 @@ import ReactionButtons from "../components/ReactionButtons";
 import ExitIntentPopup from "../components/ExitIntentPopup";
 import Link from "next/link";
 
+/** CTA unlocks when the video has played 8 minutes 30 seconds of content. */
+const CTA_UNLOCK_SECONDS = 8 * 60 + 30;
+
 export default function VSLPage() {
   const [showCTA, setShowCTA] = useState(false);
+  const [videoTime, setVideoTime] = useState(0);
 
   const handleTimerComplete = useCallback(() => {
     setShowCTA(true);
   }, []);
+
+  // Latch CTA permanently once unlock threshold is crossed — even if the
+  // viewer later rewinds or reloads.
+  const secondsLeft = Math.max(0, CTA_UNLOCK_SECONDS - Math.floor(videoTime));
 
   useEffect(() => {
     trackViewContent({ content_name: "VSL Documentario", content_type: "video" });
@@ -66,7 +74,7 @@ export default function VSLPage() {
             <div className="absolute -inset-6 md:-inset-10 bg-brand-red/[0.07] rounded-[40px] blur-3xl" />
             <div className="absolute -inset-4 md:-inset-8 bg-gold/[0.04] rounded-[30px] blur-2xl" />
             <div className="relative">
-              <VideoPlayer />
+              <VslPlayer onTimeUpdate={setVideoTime} />
             </div>
           </div>
           <ReactionButtons />
@@ -97,7 +105,7 @@ export default function VSLPage() {
         <section className="max-w-3xl mx-auto px-4 pb-4 md:pb-6">
           <AnimatePresence mode="wait">
             {!showCTA ? (
-              <CountdownTimer key="timer" onComplete={handleTimerComplete} />
+              <CountdownTimer key="timer" secondsLeft={secondsLeft} onComplete={handleTimerComplete} />
             ) : (
               <CTASection key="cta" />
             )}

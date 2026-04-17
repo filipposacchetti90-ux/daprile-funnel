@@ -1,72 +1,26 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const INITIAL_SECONDS = 2; // DEV: 2 sec per test (production: 540 = 9:00)
-
+/**
+ * Controlled countdown display. The parent derives `secondsLeft` from the
+ * VSL's currentTime so the timer is always in perfect sync with the video
+ * (pausing the video pauses the timer automatically). When secondsLeft
+ * reaches 0 we fire onComplete once.
+ */
 export default function CountdownTimer({
+  secondsLeft,
   onComplete,
 }: {
+  secondsLeft: number;
   onComplete: () => void;
 }) {
-  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
-  const [isComplete, setIsComplete] = useState(false);
-
   useEffect(() => {
-    const saved = localStorage.getItem("daprileFunnelTimer");
-    if (saved) {
-      const parsed = parseInt(saved, 10);
-      if (parsed <= 0) {
-        setIsComplete(true);
-        onComplete();
-        return;
-      }
-      setSecondsLeft(parsed);
-    } else {
-      setSecondsLeft(INITIAL_SECONDS);
-    }
-  }, [onComplete]);
+    if (secondsLeft <= 0) onComplete();
+  }, [secondsLeft, onComplete]);
 
-  useEffect(() => {
-    if (secondsLeft === null || isComplete) return;
-
-    if (secondsLeft <= 0) {
-      setIsComplete(true);
-      localStorage.setItem("daprileFunnelTimer", "0");
-      onComplete();
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev === null) return null;
-        const next = prev - 1;
-        localStorage.setItem("daprileFunnelTimer", String(next));
-        return next;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [secondsLeft, isComplete, onComplete]);
-
-  // Save on unload
-  const handleUnload = useCallback(() => {
-    if (secondsLeft !== null) {
-      localStorage.setItem("daprileFunnelTimer", String(secondsLeft));
-    }
-  }, [secondsLeft]);
-
-  useEffect(() => {
-    window.addEventListener("beforeunload", handleUnload);
-    document.addEventListener("visibilitychange", handleUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-      document.removeEventListener("visibilitychange", handleUnload);
-    };
-  }, [handleUnload]);
-
-  if (isComplete || secondsLeft === null) return null;
+  if (secondsLeft <= 0) return null;
 
   const minutes = Math.floor(secondsLeft / 60);
   const seconds = secondsLeft % 60;
