@@ -31,7 +31,7 @@ export default function VSLPage() {
 
       <main className="flex-1 relative z-10">
         {/* Hero + Video Section */}
-        <section className="px-4 pt-4 pb-2 md:pt-8 md:pb-2 max-w-5xl mx-auto">
+        <section className="px-4 pt-4 pb-2 md:pt-8 md:pb-2 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -11,13 +11,6 @@ export default function CTASection() {
       transition={{ duration: 0.8 }}
       className="text-center py-10 px-4"
     >
-      <p className="text-white/80 text-lg md:text-xl mb-2 max-w-md mx-auto font-heading italic">
-        Abbiamo qualcosa di speciale per te.
-      </p>
-      <p className="text-cream/40 text-sm mb-10 max-w-sm mx-auto">
-        Fai il quiz e scopri il caff&egrave; perfetto per i tuoi gusti.
-      </p>
-
       <Link href="/quiz">
         <motion.button
           whileHover={{ scale: 1.03 }}
@@ -32,10 +25,6 @@ export default function CTASection() {
           </span>
         </motion.button>
       </Link>
-
-      <p className="text-warm-gray/30 text-xs mt-5 tracking-wider uppercase">
-        Spedizione gratuita in tutta Italia
-      </p>
     </motion.div>
   );
 }
