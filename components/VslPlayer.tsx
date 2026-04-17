@@ -8,37 +8,57 @@ const SCRIPT_SRC =
   "https://scripts.converteai.net/0431edb9-ab92-4806-9c5b-b53cfef7582a/players/69e28540081db0f7b1d127d7/v4/player.js";
 
 type Props = {
-  /** Called when the underlying <video> pauses/plays. */
   onPlayingChange?: (playing: boolean) => void;
-  /** Called at ~250ms cadence with the current video position in seconds. */
   onTimeUpdate?: (currentTime: number) => void;
 };
 
+/** Walk the document (including shadow roots) and collect every <video> tag. */
+function collectVideosDeep(root: Document | ShadowRoot): HTMLVideoElement[] {
+  const found: HTMLVideoElement[] = [];
+  // Direct matches in this root
+  root.querySelectorAll("video").forEach((v) => found.push(v as HTMLVideoElement));
+  // Recurse into shadow roots
+  root.querySelectorAll("*").forEach((el) => {
+    const sr = (el as HTMLElement).shadowRoot;
+    if (sr) found.push(...collectVideosDeep(sr));
+  });
+  return found;
+}
+
 /**
- * VTurb SmartPlayer wrapper. Polls the underlying <video> element (which the
- * VTurb web component mounts in either its shadowRoot or light DOM once the
- * player script boots) to report play/pause + currentTime back to the parent.
- * Polling is more robust than listening to the custom-element's own events,
- * which don't always bubble out of the shadow DOM.
+ * VTurb mounts its <video> inside a shadow root that isn't necessarily a
+ * direct child of our wrapper, so we search the whole document (walking
+ * into shadow DOMs) and pick the first video with a source attached.
  */
+function pickActiveVideo(): HTMLVideoElement | null {
+  const videos = collectVideosDeep(document);
+  if (videos.length === 0) return null;
+  return videos.find((v) => !v.paused) || videos.find((v) => v.currentSrc || v.src) || videos[0];
+}
+
 export default function VslPlayer({ onPlayingChange, onTimeUpdate }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const lastPlayingRef = useRef<boolean | null>(null);
+  const warnedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
-    const findVideo = (): HTMLVideoElement | null => {
-      const host = rootRef.current?.querySelector<HTMLElement>("vturb-smartplayer");
-      if (!host) return null;
-      return (host.shadowRoot?.querySelector("video") as HTMLVideoElement | null) ?? host.querySelector("video");
-    };
+    const start = Date.now();
 
     const interval = setInterval(() => {
       if (cancelled) return;
-      const video = findVideo();
-      if (!video) return;
+      const video = pickActiveVideo();
 
-      const playing = !video.paused && !video.ended && video.readyState > 2;
+      if (!video) {
+        // Warn after 15s if we still haven't found one — useful in DevTools.
+        if (!warnedRef.current && Date.now() - start > 15000) {
+          warnedRef.current = true;
+          console.warn("[VslPlayer] No <video> element found after 15s. VTurb player may be using a non-standard renderer.");
+        }
+        return;
+      }
+
+      const playing = !video.paused && !video.ended && video.readyState >= 2;
       if (playing !== lastPlayingRef.current) {
         lastPlayingRef.current = playing;
         onPlayingChange?.(playing);
@@ -54,7 +74,6 @@ export default function VslPlayer({ onPlayingChange, onTimeUpdate }: Props) {
 
   return (
     <>
-      {/* Hoisted to <head> by React 19 — speeds up first paint of the VSL */}
       <link rel="preload" as="script" href={SCRIPT_SRC} />
       <link rel="dns-prefetch" href="https://cdn.converteai.net" />
       <link rel="dns-prefetch" href="https://scripts.converteai.net" />
