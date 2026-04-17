@@ -240,15 +240,17 @@ export default function CheckoutPage() {
               <h2 className="font-heading text-xl text-coffee-dark mb-4">Pagamento</h2>
 
               <div className="border border-cream-dark rounded-xl bg-white px-5 py-4">
-                <p className="text-base text-coffee-dark font-medium mb-3">
-                  Metodi di pagamento accettati
-                </p>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <CardBrand name="visa" />
-                  <CardBrand name="mastercard" />
-                  <CardBrand name="amex" />
-                  <CardBrand name="postepay" />
-                  <span className="ml-1"><PayPalLogo /></span>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <p className="text-base text-coffee-dark font-medium">
+                    Metodi accettati
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap [&>span:last-child>svg]:h-4">
+                    <CardBrand name="visa" />
+                    <CardBrand name="mastercard" />
+                    <CardBrand name="amex" />
+                    <CardBrand name="postepay" />
+                    <span className="inline-flex items-center"><PayPalLogo /></span>
+                  </div>
                 </div>
                 <p className="text-sm text-warm-gray leading-relaxed mt-4">
                   Al click su <strong>Completa l&apos;ordine</strong> verrai reindirizzato alla pagina di pagamento sicura dove potrai scegliere tra carta, PayPal, Apple Pay e Google Pay.
