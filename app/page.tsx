@@ -11,6 +11,8 @@ import CTASection from "../components/CTASection";
 import Footer from "../components/Footer";
 import LiveReactions from "../components/LiveReactions";
 import ReactionButtons from "../components/ReactionButtons";
+import ExitIntentPopup from "../components/ExitIntentPopup";
+import Link from "next/link";
 
 export default function VSLPage() {
   const [showCTA, setShowCTA] = useState(false);
@@ -56,6 +58,10 @@ export default function VSLPage() {
             </motion.p>
           </motion.div>
 
+          <div className="mb-4 md:mb-6">
+            <SocialProof />
+          </div>
+
           <div className="relative">
             <div className="absolute -inset-6 md:-inset-10 bg-brand-red/[0.07] rounded-[40px] blur-3xl" />
             <div className="absolute -inset-4 md:-inset-8 bg-gold/[0.04] rounded-[30px] blur-2xl" />
@@ -64,11 +70,22 @@ export default function VSLPage() {
             </div>
           </div>
           <ReactionButtons />
-        </section>
 
-        {/* Social Proof */}
-        <section className="max-w-3xl mx-auto">
-          <SocialProof />
+          {/* Read instead link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            className="text-center mt-5"
+          >
+            <Link
+              href="/documentario"
+              className="inline-flex items-center gap-2 text-cream/70 hover:text-white text-sm md:text-base transition-colors underline underline-offset-4 decoration-white/30 hover:decoration-white/60"
+            >
+              <span className="text-base">📖</span>
+              <span>Preferisci leggere? <span className="text-gold">Clicca qui</span></span>
+            </Link>
+          </motion.div>
         </section>
 
         {/* Divider */}
@@ -92,6 +109,9 @@ export default function VSLPage() {
 
       {/* Live reactions — hide after CTA appears */}
       {!showCTA && <LiveReactions />}
+
+      {/* Exit intent popup */}
+      <ExitIntentPopup />
 
       {/* Sticky warning banner */}
       <motion.div
