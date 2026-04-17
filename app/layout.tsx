@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "D'Aprile Caffè | Il Vero Caffè Artigianale Italiano",
   description:
     "Scopri il caffè artigianale italiano di altissima qualità. Tostato con cura, consegnato a casa tua.",
+  other: {
+    "facebook-domain-verification": "jmgme8v33zbt1hpsq3f68176id40e7",
+  },
 };
 
 export default function RootLayout({
