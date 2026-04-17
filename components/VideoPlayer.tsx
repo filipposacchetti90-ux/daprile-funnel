@@ -12,7 +12,7 @@ export default function VideoPlayer({ src, embedUrl }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const wrapperClass =
-    "w-full max-w-3xl mx-auto aspect-video rounded-2xl overflow-hidden border border-white/[0.06] video-glow relative";
+    "w-full max-w-5xl mx-auto aspect-video rounded-2xl overflow-hidden border border-white/[0.06] video-glow relative";
 
   if (embedUrl) {
     return (
