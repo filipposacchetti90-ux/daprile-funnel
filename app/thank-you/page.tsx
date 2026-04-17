@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { trackPurchase } from "../../lib/pixel";
+import { trackPurchase, initPixel } from "../../lib/pixel";
 
 interface OrderData {
   orderNumber?: string;
+  shopifyOrderId?: string;
   email: string;
   firstName: string;
   product: string;
@@ -27,15 +28,25 @@ export default function ThankYouPage() {
       const data = JSON.parse(saved) as OrderData;
       setOrder(data);
 
-      // Fire Purchase event once
+      // Fire Purchase event once — with eventID matching the Shopify order id
+      // so Meta dedupes against the server-side CAPI Purchase event.
       if (!tracked.current) {
         tracked.current = true;
-        trackPurchase({
-          value: data.total,
-          currency: "EUR",
-          content_name: data.product,
-          num_items: data.otoAdded ? 2 : 1,
+        // Re-init pixel with Advanced Matching so this event (and any after) is better attributed
+        initPixel({
+          em: data.email,
+          fn: data.firstName,
         });
+        const orderId = data.shopifyOrderId?.replace("gid://shopify/Order/", "") || data.orderNumber || "";
+        trackPurchase(
+          {
+            value: data.total,
+            currency: "EUR",
+            content_name: data.product,
+            num_items: data.otoAdded ? 2 : 1,
+          },
+          { eventID: orderId }
+        );
       }
 
       // Clean up quiz/timer data

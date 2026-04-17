@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import OrderNotifications from "../../components/OrderNotifications";
 import CheckoutTimer from "../../components/CheckoutTimer";
-import { trackInitiateCheckout, trackAddToCart } from "../../lib/pixel";
+import { trackInitiateCheckout, trackAddToCart, initPixel } from "../../lib/pixel";
 import { getOffersForQuiz, type FunnelProduct } from "../../lib/shopify";
 
 /* ─── Icons ─── */
@@ -105,8 +105,18 @@ export default function CheckoutPage() {
   useEffect(() => {
     const saved = localStorage.getItem("daprileQuiz");
     if (saved) {
-      setAnswers(JSON.parse(saved));
-      trackInitiateCheckout({ content_name: "Funnel Checkout", currency: "EUR" });
+      const parsedAnswers = JSON.parse(saved);
+      setAnswers(parsedAnswers);
+      // Fire InitiateCheckout with the default offer's value (mese1)
+      const offers = getOffersForQuiz(parsedAnswers.formato, parsedAnswers.intensita);
+      const defaultOffer = offers.mese1;
+      trackInitiateCheckout({
+        content_name: defaultOffer.name,
+        value: defaultOffer.price,
+        currency: "EUR",
+        content_ids: [defaultOffer.variantId],
+        num_items: 1,
+      });
     }
   }, []);
 
@@ -133,6 +143,15 @@ export default function CheckoutPage() {
   async function handleSubmit() {
     setError(null);
     setIsSubmitting(true);
+
+    // Re-init pixel with Advanced Matching (email/phone) so the events that
+    // follow + any attribution on the Shopify side benefits from better matching.
+    initPixel({
+      em: form.email,
+      ph: form.phone,
+      fn: form.firstName,
+      ln: form.lastName,
+    });
 
     try {
       const res = await fetch("/api/checkout", {
@@ -331,7 +350,7 @@ export default function CheckoutPage() {
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           setSelectedOffer(offer.id);
-                          trackAddToCart({ content_name: offer.data.name, value: offer.data.price, currency: "EUR" });
+                          trackAddToCart({ content_name: offer.data.name, value: offer.data.price, currency: "EUR", content_ids: [offer.data.variantId] });
                         }}
                         className={`w-full text-left rounded-2xl border-2 transition-all duration-200 cursor-pointer overflow-hidden ${
                           isBest
