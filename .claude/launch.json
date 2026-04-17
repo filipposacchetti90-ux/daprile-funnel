@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "funnel-dev",
+      "runtimeExecutable": "/Users/seastini_f/node/bin/npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "cwd": "/Users/seastini_f/Claude Developing/Clients/D'Aprile Caffè/funnel"
+    }
+  ]
+}

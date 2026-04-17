@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-cream: #F5F0E8;
+  --color-cream-light: #FAF7F2;
+  --color-cream-dark: #E8E0D0;
+  --color-white: #FFFFFF;
+  --color-white-soft: #FAFAFA;
+  --color-coffee: #3C2415;
+  --color-coffee-light: #5C3A24;
+  --color-coffee-dark: #2A1A0E;
+  --color-gold: #C9A96E;
+  --color-gold-light: #D4BA85;
+  --color-gold-dark: #B08D4F;
+  --color-brand-red: #B91C1C;
+  --color-brand-red-light: #DC2626;
+  --color-brand-red-dark: #991B1B;
+  --color-espresso: #1A1008;
+  --color-espresso-light: #231710;
+  --color-warm-gray: #8B7D6B;
+  --font-heading: var(--font-playfair);
+  --font-body: var(--font-inter);
+}
+
+body {
+  background: var(--color-espresso);
+  color: var(--color-cream);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), Georgia, serif;
+}
+
+/* Cinematic red vignette on page edges */
+.vignette-red::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(185, 28, 28, 0.06) 80%,
+    rgba(185, 28, 28, 0.12) 100%
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Subtle grain texture overlay */
+.bg-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ambient glow behind video */
+.video-glow {
+  box-shadow:
+    0 0 80px 20px rgba(185, 28, 28, 0.08),
+    0 0 160px 60px rgba(185, 28, 28, 0.04),
+    0 20px 60px -12px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 6px 2px var(--color-brand-red);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: 0 0 12px 5px var(--color-brand-red);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Premium gradient line */
+.premium-line {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold) 20%,
+    var(--color-brand-red) 50%,
+    var(--color-gold) 80%,
+    transparent
+  );
+}
+
+/* Warning badge pulse */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.badge-pulse {
+  animation: badge-pulse 3s ease-in-out infinite;
+}
