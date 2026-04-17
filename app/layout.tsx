@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "Scopri il caffè artigianale italiano di altissima qualità. Tostato con cura, consegnato a casa tua.",
   other: {
-    "facebook-domain-verification": "jmgme8v33zbt1hpsq3f68176id40e7",
+    "facebook-domain-verification": "ecdvpr98c6gxpdwiaa7jthvyzk08hu",
   },
 };
 
