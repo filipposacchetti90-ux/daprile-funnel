@@ -12,7 +12,6 @@ type Props = {
   onTimeUpdate?: (currentTime: number) => void;
 };
 
-/** Resolve the real <video> element, piercing shadow roots via composedPath. */
 function resolveVideo(e: Event): HTMLVideoElement | null {
   const path = (e.composedPath?.() ?? []) as EventTarget[];
   for (const node of path) {
@@ -22,17 +21,29 @@ function resolveVideo(e: Event): HTMLVideoElement | null {
 }
 
 /**
- * Bridges VTurb's internal <video> element to the parent via standard HTMLMediaElement
- * events. Media events are "composed", so even when the <video> is inside VTurb's
- * shadow DOM the events bubble up to document — we listen there with capture:true
- * and use composedPath() to recover the inner video.
+ * VTurb bridge. Two independent strategies kept in parallel:
  *
- * Falls back to a 500ms poll that deep-searches the DOM tree for a <video> tag, in
- * case the timeupdate events fire too infrequently or not at all on this renderer.
+ *   1. Real media events. `play`, `pause`, `timeupdate`, `ended` are composed
+ *      events, so we listen on `document` with capture:true and pick up the
+ *      inner <video> via composedPath() regardless of shadow-DOM depth. When
+ *      these fire we have the true currentTime of the video.
+ *
+ *   2. Click-based fallback. Some renderers (HLS in canvas, custom MediaSource
+ *      plumbing, closed shadow roots on specific browsers) never fire media
+ *      events we can observe. In that case we start a real-time counter on
+ *      the viewer's first click inside the player and tick that counter.
+ *      Accuracy is lost if the viewer pauses, but most VSL viewers don't.
+ *
+ * The two strategies never fight — whichever fires first wins, and any later
+ * real `timeupdate` overrides the real-time counter because it always carries
+ * the authoritative video currentTime.
  */
 export default function VslPlayer({ onPlayingChange, onTimeUpdate }: Props) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const lastPlayingRef = useRef<boolean | null>(null);
-  const latestVideoRef = useRef<HTMLVideoElement | null>(null);
+  const fallbackStartRef = useRef<number | null>(null); // ms timestamp when fallback counter started
+  const fallbackIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sawRealVideoRef = useRef(false); // once true, we stop the fallback counter
 
   useEffect(() => {
     const emitPlaying = (playing: boolean) => {
@@ -42,23 +53,33 @@ export default function VslPlayer({ onPlayingChange, onTimeUpdate }: Props) {
       }
     };
 
+    const stopFallback = () => {
+      if (fallbackIntervalRef.current) {
+        clearInterval(fallbackIntervalRef.current);
+        fallbackIntervalRef.current = null;
+      }
+    };
+
+    // --- Strategy 1: real media events ---
     const onPlay = (e: Event) => {
       const v = resolveVideo(e);
       if (!v) return;
-      latestVideoRef.current = v;
+      sawRealVideoRef.current = true;
+      stopFallback();
       emitPlaying(true);
       onTimeUpdate?.(v.currentTime);
     };
     const onPause = (e: Event) => {
       const v = resolveVideo(e);
       if (!v) return;
-      latestVideoRef.current = v;
+      sawRealVideoRef.current = true;
       emitPlaying(false);
     };
     const onTime = (e: Event) => {
       const v = resolveVideo(e);
       if (!v) return;
-      latestVideoRef.current = v;
+      sawRealVideoRef.current = true;
+      stopFallback();
       onTimeUpdate?.(v.currentTime);
     };
     const onEnded = () => emitPlaying(false);
@@ -68,38 +89,29 @@ export default function VslPlayer({ onPlayingChange, onTimeUpdate }: Props) {
     document.addEventListener("timeupdate", onTime, true);
     document.addEventListener("ended", onEnded, true);
 
-    // Fallback poll — deep walk into shadow roots. Useful if some browser
-    // decides not to bubble the media events out of a closed shadow root,
-    // or if the custom element re-mounts.
-    const collectVideosDeep = (root: Document | ShadowRoot): HTMLVideoElement[] => {
-      const out: HTMLVideoElement[] = [];
-      root.querySelectorAll("video").forEach((v) => out.push(v as HTMLVideoElement));
-      root.querySelectorAll("*").forEach((el) => {
-        const sr = (el as HTMLElement).shadowRoot;
-        if (sr) out.push(...collectVideosDeep(sr));
-      });
-      return out;
+    // --- Strategy 2: click-based fallback real-time counter ---
+    const wrapper = wrapperRef.current;
+    const startFallback = () => {
+      if (sawRealVideoRef.current) return; // real events already working
+      if (fallbackStartRef.current !== null) return; // already started
+      fallbackStartRef.current = Date.now();
+      emitPlaying(true);
+      fallbackIntervalRef.current = setInterval(() => {
+        if (sawRealVideoRef.current) return; // real events took over
+        if (fallbackStartRef.current === null) return;
+        const elapsed = (Date.now() - fallbackStartRef.current) / 1000;
+        onTimeUpdate?.(elapsed);
+      }, 500);
     };
-    const pollInterval = setInterval(() => {
-      if (latestVideoRef.current) {
-        const v = latestVideoRef.current;
-        const playing = !v.paused && !v.ended && v.readyState >= 2;
-        emitPlaying(playing);
-        onTimeUpdate?.(v.currentTime);
-        return;
-      }
-      const videos = collectVideosDeep(document);
-      if (videos.length === 0) return;
-      latestVideoRef.current =
-        videos.find((v) => !v.paused) || videos.find((v) => v.currentSrc || v.src) || videos[0];
-    }, 500);
+    wrapper?.addEventListener("click", startFallback);
 
     return () => {
       document.removeEventListener("play", onPlay, true);
       document.removeEventListener("pause", onPause, true);
       document.removeEventListener("timeupdate", onTime, true);
       document.removeEventListener("ended", onEnded, true);
-      clearInterval(pollInterval);
+      wrapper?.removeEventListener("click", startFallback);
+      stopFallback();
     };
   }, [onPlayingChange, onTimeUpdate]);
 
@@ -109,7 +121,10 @@ export default function VslPlayer({ onPlayingChange, onTimeUpdate }: Props) {
       <link rel="dns-prefetch" href="https://cdn.converteai.net" />
       <link rel="dns-prefetch" href="https://scripts.converteai.net" />
 
-      <div className="w-full max-w-7xl mx-auto aspect-video rounded-2xl overflow-hidden border border-white/[0.06] video-glow relative">
+      <div
+        ref={wrapperRef}
+        className="w-full max-w-7xl mx-auto aspect-video rounded-2xl overflow-hidden border border-white/[0.06] video-glow relative"
+      >
         <vturb-smartplayer
           id={PLAYER_ID}
           style={{ display: "block", margin: "0 auto", width: "100%" }}
