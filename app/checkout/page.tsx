@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import OrderNotifications from "../../components/OrderNotifications";
 import CheckoutTimer from "../../components/CheckoutTimer";
 import { trackInitiateCheckout, trackAddToCart } from "../../lib/pixel";
@@ -94,16 +93,13 @@ function QuizTag({ label, value }: { label: string; value: string }) {
 
 /* ─── Checkout Page ─── */
 export default function CheckoutPage() {
-  const router = useRouter();
   const [answers, setAnswers] = useState<{ formato: string; intensita: string; consumo: string; famiglia: string } | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<"kit" | "mese1" | "mesi3">("mese1");
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     email: "", firstName: "", lastName: "", address: "", city: "",
-    province: "", cap: "", phone: "", cardNumber: "", cardExpiry: "",
-    cardCvc: "", cardName: "",
+    province: "", cap: "", phone: "",
   });
 
   useEffect(() => {
@@ -139,12 +135,10 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Step 1: Create checkout (both for card and PayPal)
-      const createRes = await fetch("/api/checkout", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "create",
           variantId: currentOffer.data.variantId,
           email: form.email,
           shipping: {
@@ -158,64 +152,24 @@ export default function CheckoutPage() {
           },
         }),
       });
-      const createData = await createRes.json();
+      const data = await res.json();
 
-      if (!createData.success) {
-        throw new Error(createData.error || "Errore nella creazione dell'ordine");
+      if (!data.success || !data.cart?.checkoutUrl) {
+        throw new Error(data.error || "Errore nella creazione dell'ordine");
       }
 
-      // If PayPal: save info and redirect to Shopify checkout URL
-      if (paymentMethod === "paypal") {
-        localStorage.setItem("daprileOrder", JSON.stringify({
-          email: form.email,
-          firstName: form.firstName,
-          product: currentOffer.data.name,
-          quantity: currentOffer.data.quantity,
-          total: currentOffer.data.price,
-          paymentMethod: "paypal",
-        }));
-        window.location.href = createData.checkout.webUrl;
-        return;
-      }
-
-      // Step 2: Complete card payment
-      const completeRes = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "complete",
-          checkoutId: createData.checkout.id,
-          amount: String(currentOffer.data.price),
-          firstName: form.firstName,
-          lastName: form.lastName,
-          card: {
-            number: form.cardNumber,
-            expiry: form.cardExpiry,
-            cvc: form.cardCvc,
-          },
-        }),
-      });
-      const completeData = await completeRes.json();
-
-      if (!completeData.success) {
-        throw new Error(completeData.error || "Errore nel pagamento");
-      }
-
-      // Save order info and redirect
       localStorage.setItem("daprileOrder", JSON.stringify({
-        orderNumber: completeData.order?.orderNumber || completeData.order?.name,
-        shopifyOrderId: completeData.order?.id,
         email: form.email,
         firstName: form.firstName,
         product: currentOffer.data.name,
         quantity: currentOffer.data.quantity,
         total: currentOffer.data.price,
+        cartId: data.cart.id,
       }));
 
-      router.push("/oto");
+      window.location.href = data.cart.checkoutUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore durante il checkout");
-    } finally {
       setIsSubmitting(false);
     }
   }
@@ -285,64 +239,20 @@ export default function CheckoutPage() {
             <section className="mb-10">
               <h2 className="font-heading text-xl text-coffee-dark mb-4">Pagamento</h2>
 
-              <div className="space-y-3">
-                {/* Card option */}
-                <div
-                  onClick={() => setPaymentMethod("card")}
-                  className={`border rounded-xl overflow-hidden bg-white cursor-pointer transition-all ${
-                    paymentMethod === "card" ? "border-gold ring-2 ring-gold/20 shadow-md shadow-gold/10" : "border-cream-dark"
-                  }`}
-                >
-                  <div className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${paymentMethod === "card" ? "border-gold-dark" : "border-cream-dark"}`}>
-                        {paymentMethod === "card" && <div className="w-3 h-3 rounded-full bg-coffee" />}
-                      </div>
-                      <span className="text-base text-coffee-dark font-medium">Carta di credito o debito</span>
-                    </div>
-                    <div className="flex items-center gap-1 ml-8 mt-2 flex-wrap">
-                      <CardBrand name="visa" />
-                      <CardBrand name="mastercard" />
-                      <CardBrand name="amex" />
-                      <CardBrand name="postepay" />
-                    </div>
-                  </div>
-                  {paymentMethod === "card" && (
-                    <div className="p-5 border-t border-cream-dark/50 bg-cream-light/30 space-y-3">
-                      <FloatingInput label="Numero carta" name="cardNumber" value={form.cardNumber} onChange={handleChange} />
-                      <FloatingInput label="Intestatario carta" name="cardName" value={form.cardName} onChange={handleChange} />
-                      <div className="flex gap-3">
-                        <FloatingInput label="MM / AA" name="cardExpiry" value={form.cardExpiry} onChange={handleChange} half />
-                        <FloatingInput label="CVV" name="cardCvc" value={form.cardCvc} onChange={handleChange} half />
-                      </div>
-                    </div>
-                  )}
+              <div className="border border-cream-dark rounded-xl bg-white px-5 py-4">
+                <p className="text-base text-coffee-dark font-medium mb-3">
+                  Metodi di pagamento accettati
+                </p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <CardBrand name="visa" />
+                  <CardBrand name="mastercard" />
+                  <CardBrand name="amex" />
+                  <CardBrand name="postepay" />
+                  <span className="ml-1"><PayPalLogo /></span>
                 </div>
-
-                {/* PayPal option */}
-                <div
-                  onClick={() => setPaymentMethod("paypal")}
-                  className={`border rounded-xl overflow-hidden bg-white cursor-pointer transition-all ${
-                    paymentMethod === "paypal" ? "border-gold ring-2 ring-gold/20 shadow-md shadow-gold/10" : "border-cream-dark"
-                  }`}
-                >
-                  <div className="px-5 py-4 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${paymentMethod === "paypal" ? "border-gold-dark" : "border-cream-dark"}`}>
-                        {paymentMethod === "paypal" && <div className="w-3 h-3 rounded-full bg-coffee" />}
-                      </div>
-                      <span className="text-base text-coffee-dark font-medium">PayPal</span>
-                    </div>
-                    <PayPalLogo />
-                  </div>
-                  {paymentMethod === "paypal" && (
-                    <div className="px-5 py-4 border-t border-cream-dark/50 bg-cream-light/30">
-                      <p className="text-sm text-warm-gray leading-relaxed">
-                        Verrai reindirizzato a PayPal per completare il pagamento in totale sicurezza. Tornerai qui automaticamente dopo la conferma.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <p className="text-sm text-warm-gray leading-relaxed mt-4">
+                  Al click su <strong>Completa l&apos;ordine</strong> verrai reindirizzato alla pagina di pagamento sicura dove potrai scegliere tra carta, PayPal, Apple Pay e Google Pay.
+                </p>
               </div>
 
               <p className="text-sm text-warm-gray/60 mt-3 flex items-center justify-center gap-2">

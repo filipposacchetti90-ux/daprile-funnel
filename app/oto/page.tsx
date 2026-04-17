@@ -16,17 +16,24 @@ export default function OtoPage() {
 
   useEffect(() => {
     const quiz = localStorage.getItem("daprileQuiz");
-    const order = localStorage.getItem("daprileOrder");
     if (!quiz) { router.push("/thank-you"); return; }
 
     const answers = JSON.parse(quiz);
     const offer = getOtoOffer(answers.formato, answers.intensita);
     setOto(offer);
 
-    if (order) {
-      const orderData = JSON.parse(order);
-      setFirstName(orderData.firstName || "");
+    // Merge Shopify order info from query params (sent by the order-status page script)
+    const params = new URLSearchParams(window.location.search);
+    const orderIdParam = params.get("order");
+    const orderNameParam = params.get("name");
+
+    const existing = JSON.parse(localStorage.getItem("daprileOrder") || "{}");
+    if (orderIdParam) {
+      existing.shopifyOrderId = `gid://shopify/Order/${orderIdParam}`;
+      if (orderNameParam) existing.orderNumber = orderNameParam;
+      localStorage.setItem("daprileOrder", JSON.stringify(existing));
     }
+    setFirstName(existing.firstName || "");
 
     trackCustom("OtoView", { formato: answers.formato, intensita: answers.intensita });
   }, [router]);

@@ -255,103 +255,64 @@ async function storefrontFetch(query: string, variables?: Record<string, unknown
   return res.json();
 }
 
-/* ─── Create Checkout ─── */
-export async function createCheckout(variantId: string, email: string, shippingAddress: {
+/* ─── Create Cart (Storefront Cart API) ───
+   Returns a cart with a hosted checkoutUrl. The user is redirected there
+   to complete payment (card / PayPal / Apple Pay / Google Pay handled by Shopify).
+   Buyer identity + shipping address are pre-filled so the user only picks a payment method. */
+export async function createCart(variantId: string, email: string, shippingAddress: {
   firstName: string;
   lastName: string;
   address1: string;
   city: string;
   province: string;
   zip: string;
-  country: string;
   phone: string;
 }) {
-  // Step 1: Create checkout with line item
-  const createResult = await storefrontFetch(`
-    mutation checkoutCreate($input: CheckoutCreateInput!) {
-      checkoutCreate(input: $input) {
-        checkout {
+  const result = await storefrontFetch(`
+    mutation cartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
           id
-          webUrl
-          totalPriceV2 { amount currencyCode }
+          checkoutUrl
+          totalQuantity
+          cost { totalAmount { amount currencyCode } }
         }
-        checkoutUserErrors { field message }
+        userErrors { field message }
       }
     }
   `, {
     input: {
-      lineItems: [{ variantId, quantity: 1 }],
-      email,
-      shippingAddress: {
-        ...shippingAddress,
-        country: "IT",
+      lines: [{ merchandiseId: variantId, quantity: 1 }],
+      attributes: [{ key: "source", value: "funnel" }],
+      buyerIdentity: {
+        email,
+        phone: shippingAddress.phone,
+        countryCode: "IT",
+        deliveryAddressPreferences: [{
+          deliveryAddress: {
+            firstName: shippingAddress.firstName,
+            lastName: shippingAddress.lastName,
+            address1: shippingAddress.address1,
+            city: shippingAddress.city,
+            province: shippingAddress.province,
+            zip: shippingAddress.zip,
+            country: "IT",
+            phone: shippingAddress.phone,
+          },
+        }],
       },
     },
   });
 
-  const checkout = createResult.data?.checkoutCreate?.checkout;
-  const errors = createResult.data?.checkoutCreate?.checkoutUserErrors;
-
+  const errors = result.data?.cartCreate?.userErrors;
   if (errors?.length > 0) {
     throw new Error(errors.map((e: { message: string }) => e.message).join(", "));
   }
 
-  return checkout;
-}
+  const cart = result.data?.cartCreate?.cart;
+  if (!cart?.checkoutUrl) {
+    throw new Error("Impossibile creare il carrello");
+  }
 
-/* ─── Tokenize Credit Card via Shopify Card Vault ─── */
-export async function tokenizeCard(card: {
-  number: string;
-  firstName: string;
-  lastName: string;
-  month: string;
-  year: string;
-  verificationValue: string;
-}) {
-  const res = await fetch("https://elb.deposit.shopifycs.com/sessions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      credit_card: {
-        number: card.number,
-        first_name: card.firstName,
-        last_name: card.lastName,
-        month: parseInt(card.month),
-        year: parseInt(card.year.length === 2 ? `20${card.year}` : card.year),
-        verification_value: card.verificationValue,
-      },
-    }),
-  });
-  const data = await res.json();
-  return data.id; // vault token
-}
-
-/* ─── Complete Checkout with Credit Card ─── */
-export async function completeCheckout(checkoutId: string, vaultToken: string, amount: string, idempotencyKey: string) {
-  const result = await storefrontFetch(`
-    mutation checkoutCompleteWithCreditCardV2($checkoutId: ID!, $payment: CreditCardPaymentInputV2!) {
-      checkoutCompleteWithCreditCardV2(checkoutId: $checkoutId, payment: $payment) {
-        checkout {
-          id
-          order { id orderNumber name }
-        }
-        checkoutUserErrors { field message }
-        payment {
-          id
-          errorMessage
-          ready
-        }
-      }
-    }
-  `, {
-    checkoutId,
-    payment: {
-      paymentAmount: { amount, currencyCode: "EUR" },
-      idempotencyKey,
-      billingAddress: { firstName: "", lastName: "", address1: "", city: "", province: "", zip: "", country: "IT" },
-      vaultId: vaultToken,
-    },
-  });
-
-  return result.data?.checkoutCompleteWithCreditCardV2;
+  return cart as { id: string; checkoutUrl: string; totalQuantity: number };
 }
