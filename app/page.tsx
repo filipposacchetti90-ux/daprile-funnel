@@ -19,15 +19,19 @@ const CTA_UNLOCK_SECONDS = 8 * 60 + 30;
 
 export default function VSLPage() {
   const [showCTA, setShowCTA] = useState(false);
-  const [videoTime, setVideoTime] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(CTA_UNLOCK_SECONDS);
 
   const handleTimerComplete = useCallback(() => {
     setShowCTA(true);
   }, []);
 
-  // Latch CTA permanently once unlock threshold is crossed — even if the
-  // viewer later rewinds or reloads.
-  const secondsLeft = Math.max(0, CTA_UNLOCK_SECONDS - Math.floor(videoTime));
+  // Real-time countdown, starts at page load. Simple + bulletproof.
+  useEffect(() => {
+    const tick = setInterval(() => {
+      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(tick);
+  }, []);
 
   useEffect(() => {
     trackViewContent({ content_name: "VSL Documentario", content_type: "video" });
@@ -76,7 +80,7 @@ export default function VSLPage() {
             <div className="absolute -inset-6 md:-inset-10 bg-brand-red/[0.07] rounded-[40px] blur-3xl" />
             <div className="absolute -inset-4 md:-inset-8 bg-gold/[0.04] rounded-[30px] blur-2xl" />
             <div className="relative">
-              <VslPlayer onTimeUpdate={setVideoTime} />
+              <VslPlayer />
             </div>
           </div>
           <ReactionButtons />
