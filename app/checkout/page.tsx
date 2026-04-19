@@ -385,6 +385,9 @@ export default function CheckoutPage() {
                               <p className="text-xs text-warm-gray/50 line-through tabular-nums">&euro;{offer.data.compareAtPrice.toFixed(2)}</p>
                             )}
                             <p className={`font-bold text-coffee-dark tabular-nums ${isBest ? "text-2xl" : "text-lg"}`}>&euro;{offer.data.price.toFixed(2)}</p>
+                            {offer.data.pricePerUnit && (
+                              <p className="text-[11px] text-warm-gray/70 tabular-nums mt-0.5">{offer.data.pricePerUnit}</p>
+                            )}
                           </div>
                         </div>
                       </motion.button>

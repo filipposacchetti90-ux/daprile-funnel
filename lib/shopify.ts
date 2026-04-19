@@ -216,6 +216,22 @@ export function getOtoOffer(formato: string, intensita: string): OtoOffer | null
   };
 }
 
+/* ─── Format "€X.XX / cialda" from price + quantity string like "200 cialde" ─── */
+function formatPricePerUnit(price: number, quantity: string): string {
+  const match = quantity.match(/^(\d+(?:[.,]\d+)?)\s*(\w+)/i);
+  if (!match) return "";
+  const num = parseFloat(match[1].replace(",", "."));
+  if (!num) return "";
+  const unitRaw = match[2].toLowerCase();
+  const singular: Record<string, string> = {
+    cialde: "cialda",
+    capsule: "capsula",
+    kg: "kg",
+  };
+  const unit = singular[unitRaw] || unitRaw;
+  return `€${(price / num).toFixed(2)}/${unit}`;
+}
+
 /* ─── Get offers for quiz answers ─── */
 export function getOffersForQuiz(formato: string, intensita: string): FunnelOffers & { formatName: string; miscela: string } {
   const f = (formato as FormatoKey) || "capsule-nespresso";
@@ -242,6 +258,7 @@ export function getOffersForQuiz(formato: string, intensita: string): FunnelOffe
       compareAtPrice: Math.round(data.kit.price * 1.15 * 100) / 100,
       variantId: data.kit.variantId,
       imageUrl: data.image,
+      pricePerUnit: formatPricePerUnit(data.kit.price, data.kit.quantity),
     },
     mese1: {
       name: "Per un mese intero",
@@ -251,6 +268,7 @@ export function getOffersForQuiz(formato: string, intensita: string): FunnelOffe
       compareAtPrice: mese1Compare > data.mese1.price ? mese1Compare : undefined,
       variantId: data.mese1.variantId,
       imageUrl: data.image,
+      pricePerUnit: formatPricePerUnit(data.mese1.price, data.mese1.quantity),
     },
     mesi3: {
       name: "Non restare mai senza",
@@ -260,6 +278,7 @@ export function getOffersForQuiz(formato: string, intensita: string): FunnelOffe
       compareAtPrice: mesi3Compare > data.mesi3.price ? mesi3Compare : undefined,
       variantId: data.mesi3.variantId,
       imageUrl: data.image,
+      pricePerUnit: formatPricePerUnit(data.mesi3.price, data.mesi3.quantity),
     },
   };
 }
