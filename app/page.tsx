@@ -25,12 +25,20 @@ export default function VSLPage() {
     setShowCTA(true);
   }, []);
 
-  // Real-time countdown, starts at page load. Simple + bulletproof.
+  // Real-time countdown based on Date.now() deltas, not a decrementing
+  // counter. setInterval is throttled to ~1 tick/min when the tab is
+  // backgrounded, so a `prev - 1` counter drifts or stalls. Computing
+  // elapsed from a fixed startTime self-corrects on the next tick when
+  // the tab returns to the foreground.
   useEffect(() => {
-    const tick = setInterval(() => {
-      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(tick);
+    const startTime = Date.now();
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setSecondsLeft(Math.max(0, CTA_UNLOCK_SECONDS - elapsed));
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

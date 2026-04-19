@@ -3,12 +3,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/**
- * Controlled countdown display. The parent derives `secondsLeft` from the
- * VSL's currentTime so the timer is always in perfect sync with the video
- * (pausing the video pauses the timer automatically). When secondsLeft
- * reaches 0 we fire onComplete once.
- */
+/** Controlled countdown display. Parent owns the tick; we fire onComplete once at 0. */
 export default function CountdownTimer({
   secondsLeft,
   onComplete,
