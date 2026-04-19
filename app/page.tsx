@@ -16,6 +16,9 @@ import Link from "next/link";
 
 /** CTA unlocks when the video has played 8 minutes 30 seconds of content. */
 const CTA_UNLOCK_SECONDS = 8 * 60 + 30;
+/** If the viewer already waited once, keep the CTA unlocked for this long on return visits. */
+const UNLOCK_MEMO_KEY = "daprileVSLUnlockedAt";
+const UNLOCK_MEMO_TTL_MS = 72 * 60 * 60 * 1000;
 
 export default function VSLPage() {
   const [showCTA, setShowCTA] = useState(false);
@@ -23,6 +26,9 @@ export default function VSLPage() {
 
   const handleTimerComplete = useCallback(() => {
     setShowCTA(true);
+    try {
+      localStorage.setItem(UNLOCK_MEMO_KEY, Date.now().toString());
+    } catch {}
   }, []);
 
   // Real-time countdown based on Date.now() deltas, not a decrementing
@@ -30,7 +36,22 @@ export default function VSLPage() {
   // backgrounded, so a `prev - 1` counter drifts or stalls. Computing
   // elapsed from a fixed startTime self-corrects on the next tick when
   // the tab returns to the foreground.
+  // Returning viewers who already waited the full countdown skip it for
+  // UNLOCK_MEMO_TTL_MS, after which the memo expires and the timer runs again.
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem(UNLOCK_MEMO_KEY);
+      if (saved) {
+        const ts = parseInt(saved, 10);
+        if (Number.isFinite(ts) && Date.now() - ts < UNLOCK_MEMO_TTL_MS) {
+          setSecondsLeft(0);
+          setShowCTA(true);
+          return;
+        }
+        localStorage.removeItem(UNLOCK_MEMO_KEY);
+      }
+    } catch {}
+
     const startTime = Date.now();
     const tick = () => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
