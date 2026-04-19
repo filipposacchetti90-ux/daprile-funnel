@@ -14,8 +14,8 @@ import ReactionButtons from "../components/ReactionButtons";
 import ExitIntentPopup from "../components/ExitIntentPopup";
 import Link from "next/link";
 
-/** CTA unlocks when the video has played 8 minutes 30 seconds of content. */
-const CTA_UNLOCK_SECONDS = 8 * 60 + 30;
+/** CTA unlocks when the video has played 5 minutes 45 seconds of content. */
+const CTA_UNLOCK_SECONDS = 5 * 60 + 45;
 /** If the viewer already waited once, keep the CTA unlocked for this long on return visits. */
 const UNLOCK_MEMO_KEY = "daprileVSLUnlockedAt";
 const UNLOCK_MEMO_TTL_MS = 72 * 60 * 60 * 1000;
