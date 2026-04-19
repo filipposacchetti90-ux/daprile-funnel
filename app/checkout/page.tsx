@@ -325,8 +325,15 @@ export default function CheckoutPage() {
               {/* Product result */}
               <div className="bg-white rounded-2xl border border-cream-dark/50 p-6 shadow-sm">
                 <p className="text-xs text-gold-dark uppercase tracking-[0.2em] font-semibold mb-3">Selezionato per te</p>
-                <h3 className="font-heading text-xl text-coffee-dark mb-1">{offerData.formatName}</h3>
-                <p className="text-base text-warm-gray mb-4">Miscela {offerData.miscela}</p>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-cream-light border border-cream-dark/30">
+                    <Image src={offerData.mese1.imageUrl} alt={offerData.formatName} fill className="object-contain p-1" sizes="96px" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-heading text-lg md:text-xl text-coffee-dark leading-tight mb-0.5">{offerData.formatName}</h3>
+                    <p className="text-sm md:text-base text-warm-gray">Miscela {offerData.miscela}</p>
+                  </div>
+                </div>
                 <div className="flex gap-3">
                   <QuizTag label="Intensità" value={answers.intensita} />
                   <QuizTag label="Consumo" value={`${answers.consumo}/giorno`} />

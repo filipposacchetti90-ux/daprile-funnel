@@ -11,6 +11,7 @@ export interface FunnelProduct {
   compareAtPrice?: number;
   variantId: string;
   pricePerUnit?: string;
+  imageUrl: string;
 }
 
 export interface FunnelOffers {
@@ -23,22 +24,25 @@ type FormatoKey = "cialde-44mm" | "capsule-nespresso" | "capsule-lavazza-amo" | 
 type IntensitaKey = "leggero" | "medio" | "intenso";
 
 /* ─── Full product map ─── */
-const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; kit: { variantId: string; price: number; quantity: string }; mese1: { variantId: string; price: number; quantity: string }; mesi3: { variantId: string; price: number; quantity: string } }>> = {
+const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; image: string; kit: { variantId: string; price: number; quantity: string }; mese1: { variantId: string; price: number; quantity: string }; mesi3: { variantId: string; price: number; quantity: string } }>> = {
   "cialde-44mm": {
     leggero: {
       miscela: "Classica",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/CLASSICA_CIALDA.png?v=1764195597",
       kit: { variantId: "gid://shopify/ProductVariant/54014221975898", price: 23, quantity: "60 cialde" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008634147162", price: 54, quantity: "200 cialde" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634343770", price: 149, quantity: "600 cialde" },
     },
     medio: {
       miscela: "Gran Crema",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/CIALDA_8G_GRAN_CREMA.png?v=1764196249",
       kit: { variantId: "gid://shopify/ProductVariant/54014221975898", price: 23, quantity: "60 cialde" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008634179930", price: 54, quantity: "200 cialde" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634376538", price: 149, quantity: "600 cialde" },
     },
     intenso: {
       miscela: "Crema Oro",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/CIALDA_MISCELA_CREMA_ORO.png?v=1764196301",
       kit: { variantId: "gid://shopify/ProductVariant/54014221975898", price: 23, quantity: "60 cialde" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008634212698", price: 54, quantity: "200 cialde" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634409306", price: 149, quantity: "600 cialde" },
@@ -47,18 +51,21 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; kit
   "capsule-nespresso": {
     leggero: {
       miscela: "Gran Crema",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5452-1000x1000.jpg?v=1712326459",
       kit: { variantId: "gid://shopify/ProductVariant/54014222041434", price: 35.5, quantity: "100 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008634835290", price: 65, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634933594", price: 179, quantity: "600 capsule" },
     },
     medio: {
       miscela: "Gran Crema",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5452-1000x1000.jpg?v=1712326459",
       kit: { variantId: "gid://shopify/ProductVariant/54014222041434", price: 35.5, quantity: "100 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008634835290", price: 65, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634933594", price: 179, quantity: "600 capsule" },
     },
     intenso: {
       miscela: "Crema Oro",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5453-1000x1000.jpg?v=1712326421",
       kit: { variantId: "gid://shopify/ProductVariant/54014222172506", price: 35.5, quantity: "100 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008634868058", price: 65, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634966362", price: 179, quantity: "600 capsule" },
@@ -67,18 +74,21 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; kit
   "capsule-lavazza-amo": {
     leggero: {
       miscela: "Brasile",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5444-1000x1000.jpg?v=1712326170",
       kit: { variantId: "gid://shopify/ProductVariant/54014222270810", price: 36.5, quantity: "100 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008635031898", price: 67, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008635130202", price: 185, quantity: "600 capsule" },
     },
     medio: {
       miscela: "Crema Oro",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/Nuovo_progetto_1.png?v=1729679551",
       kit: { variantId: "gid://shopify/ProductVariant/54014222401882", price: 36.5, quantity: "100 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008635064666", price: 67, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008635162970", price: 185, quantity: "600 capsule" },
     },
     intenso: {
       miscela: "Nero",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5446-1000x1000.jpg?v=1712326301",
       kit: { variantId: "gid://shopify/ProductVariant/54014222434650", price: 36.5, quantity: "100 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008635097434", price: 67, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008635195738", price: 185, quantity: "600 capsule" },
@@ -87,18 +97,21 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; kit
   "lavazza-espresso-point": {
     leggero: {
       miscela: "Classica",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5439-1000x1000.jpg?v=1712259095",
       kit: { variantId: "gid://shopify/ProductVariant/54014222500186", price: 25, quantity: "60 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646369626", price: 58, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008646467930", price: 162, quantity: "600 capsule" },
     },
     medio: {
       miscela: "Gran Crema",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5437-1000x1000.jpg?v=1712326367",
       kit: { variantId: "gid://shopify/ProductVariant/54014222500186", price: 25, quantity: "60 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646402394", price: 58, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008646500698", price: 162, quantity: "600 capsule" },
     },
     intenso: {
       miscela: "Crema Oro",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5440-1000x1000.jpg?v=1712326336",
       kit: { variantId: "gid://shopify/ProductVariant/54014222500186", price: 25, quantity: "60 capsule" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646435162", price: 58, quantity: "200 capsule" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008646599002", price: 162, quantity: "600 capsule" },
@@ -107,18 +120,21 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; kit
   grani: {
     leggero: {
       miscela: "Gran Bar",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/caffe-grani-img_e6f75294-b84d-4c9b-a230-bcbf9686627e.jpg?v=1710411464",
       kit: { variantId: "gid://shopify/ProductVariant/54014222532954", price: 28, quantity: "1 kg" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646664538", price: 52, quantity: "2 kg" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008646762842", price: 119, quantity: "5 kg" },
     },
     medio: {
       miscela: "Santo Domingo",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/caffe-grani-img_f8d1741d-374c-4fd8-b3b4-1672eec8546d.jpg?v=1710411538",
       kit: { variantId: "gid://shopify/ProductVariant/54014222598490", price: 33, quantity: "1 kg" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646697306", price: 60, quantity: "2 kg" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008646795610", price: 139, quantity: "5 kg" },
     },
     intenso: {
       miscela: "Kaapi Royale",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/caffe-grani-img_30109224-7fa8-4cb2-ab94-28a2a273c6a8.jpg?v=1710411625",
       kit: { variantId: "gid://shopify/ProductVariant/54014222664026", price: 30, quantity: "1 kg" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646730074", price: 55, quantity: "2 kg" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008646893914", price: 125, quantity: "5 kg" },
@@ -127,18 +143,21 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; kit
   "miscela-moka": {
     leggero: {
       miscela: "Gran Bar",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/caffe-grani-img_e6f75294-b84d-4c9b-a230-bcbf9686627e.jpg?v=1710411464",
       kit: { variantId: "gid://shopify/ProductVariant/54014222729562", price: 28, quantity: "1 kg" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646926682", price: 52, quantity: "2 kg" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008647024986", price: 119, quantity: "5 kg" },
     },
     medio: {
       miscela: "Super Bar",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/caffe-grani-img_87de8713-a586-4849-bd72-a0480812a4c4.jpg?v=1710411380",
       kit: { variantId: "gid://shopify/ProductVariant/54014222795098", price: 27, quantity: "1 kg" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646959450", price: 52, quantity: "2 kg" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008647057754", price: 119, quantity: "5 kg" },
     },
     intenso: {
       miscela: "Crema Oro",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/caffe-grani-img_87de8713-a586-4849-bd72-a0480812a4c4.jpg?v=1710411380",
       kit: { variantId: "gid://shopify/ProductVariant/54014222860634", price: 27, quantity: "1 kg" },
       mese1: { variantId: "gid://shopify/ProductVariant/54008646992218", price: 52, quantity: "2 kg" },
       mesi3: { variantId: "gid://shopify/ProductVariant/54008647483738", price: 119, quantity: "5 kg" },
@@ -222,6 +241,7 @@ export function getOffersForQuiz(formato: string, intensita: string): FunnelOffe
       price: data.kit.price,
       compareAtPrice: Math.round(data.kit.price * 1.15 * 100) / 100,
       variantId: data.kit.variantId,
+      imageUrl: data.image,
     },
     mese1: {
       name: "Per un mese intero",
@@ -230,6 +250,7 @@ export function getOffersForQuiz(formato: string, intensita: string): FunnelOffe
       price: data.mese1.price,
       compareAtPrice: mese1Compare > data.mese1.price ? mese1Compare : undefined,
       variantId: data.mese1.variantId,
+      imageUrl: data.image,
     },
     mesi3: {
       name: "Non restare mai senza",
@@ -238,6 +259,7 @@ export function getOffersForQuiz(formato: string, intensita: string): FunnelOffe
       price: data.mesi3.price,
       compareAtPrice: mesi3Compare > data.mesi3.price ? mesi3Compare : undefined,
       variantId: data.mesi3.variantId,
+      imageUrl: data.image,
     },
   };
 }
