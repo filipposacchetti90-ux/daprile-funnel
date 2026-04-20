@@ -6,6 +6,7 @@ import { trackViewContent } from "../lib/pixel";
 import Header from "../components/Header";
 import VslPlayer from "../components/VslPlayer";
 import SocialProof from "../components/SocialProof";
+import TrustSignals from "../components/TrustSignals";
 import CountdownTimer from "../components/CountdownTimer";
 import CTASection from "../components/CTASection";
 import Footer from "../components/Footer";
@@ -113,6 +114,11 @@ export default function VSLPage() {
             </div>
           </div>
           <ReactionButtons />
+
+          {/* Trust signals — brand heritage */}
+          <div className="mt-6 md:mt-8">
+            <TrustSignals variant="vsl" />
+          </div>
 
           {/* Read instead link */}
           <motion.div

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import OrderNotifications from "../../components/OrderNotifications";
+import TrustSignals from "../../components/TrustSignals";
 import { trackLead, trackCustom } from "../../lib/pixel";
 
 /* ─── Types ─── */
@@ -327,8 +328,13 @@ export default function QuizPage() {
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-10 relative z-10">
         {/* Progress */}
-        <div className="w-full mb-10">
+        <div className="w-full mb-6">
           <ProgressBar current={step} total={questions.length} />
+        </div>
+
+        {/* Trust signals — reassure during the quiz flow */}
+        <div className="w-full mb-6">
+          <TrustSignals variant="quiz" />
         </div>
 
         {/* Question */}

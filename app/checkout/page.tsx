@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import OrderNotifications from "../../components/OrderNotifications";
 import CheckoutTimer from "../../components/CheckoutTimer";
+import TrustSignals from "../../components/TrustSignals";
+import BrandQuotes from "../../components/BrandQuotes";
 import { trackInitiateCheckout, trackAddToCart, initPixel } from "../../lib/pixel";
 import { getOffersForQuiz, type FunnelProduct } from "../../lib/shopify";
 
@@ -203,7 +205,12 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-14">
+      {/* Trust signals — brand heritage right below the header */}
+      <div className="max-w-5xl mx-auto px-4 pt-5">
+        <TrustSignals variant="checkout" />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
         <div className="flex flex-col-reverse md:flex-row gap-10 md:gap-14">
 
           {/* ─── LEFT: Form ─── */}
@@ -281,6 +288,11 @@ export default function CheckoutPage() {
                 Transazione crittografata e sicura
               </p>
             </section>
+
+            {/* Brand quotes — reassurance right before the CTA */}
+            <div className="mb-6 bg-white rounded-xl border border-cream-dark/40 px-4">
+              <BrandQuotes compact />
+            </div>
 
             {/* Error */}
             {error && (
