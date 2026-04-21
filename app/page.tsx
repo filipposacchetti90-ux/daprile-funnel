@@ -115,10 +115,12 @@ export default function VSLPage() {
           </div>
           <ReactionButtons />
 
-          {/* Trust signals — brand heritage */}
-          <div className="mt-6 md:mt-8">
-            <TrustSignals variant="vsl" />
-          </div>
+          {/* Trust signals — appaiono solo dopo che il timer ha sbloccato la CTA */}
+          {showCTA && (
+            <div className="mt-6 md:mt-8">
+              <TrustSignals variant="vsl" />
+            </div>
+          )}
 
           {/* Read instead link */}
           <motion.div
