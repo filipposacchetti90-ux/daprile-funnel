@@ -41,11 +41,11 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; ima
       mesi3: { variantId: "gid://shopify/ProductVariant/54008634376538", price: 149, quantity: "600 cialde" },
     },
     intenso: {
-      miscela: "Crema Oro",
-      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/CIALDA_MISCELA_CREMA_ORO.png?v=1764196301",
-      kit: { variantId: "gid://shopify/ProductVariant/54026885169498", price: 30, quantity: "100 cialde" },
-      mese1: { variantId: "gid://shopify/ProductVariant/54008634212698", price: 55, quantity: "200 cialde" },
-      mesi3: { variantId: "gid://shopify/ProductVariant/54008634409306", price: 149, quantity: "600 cialde" },
+      miscela: "Extra Forte",
+      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/Photoroom_20260427_121717.jpg?v=1777285370",
+      kit: { variantId: "gid://shopify/ProductVariant/54085476286810", price: 30, quantity: "100 cialde" },
+      mese1: { variantId: "gid://shopify/ProductVariant/54085477695834", price: 55, quantity: "200 cialde" },
+      mesi3: { variantId: "gid://shopify/ProductVariant/54085477761370", price: 149, quantity: "600 cialde" },
     },
   },
   "capsule-nespresso": {
