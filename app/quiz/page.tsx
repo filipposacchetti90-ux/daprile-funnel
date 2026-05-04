@@ -52,15 +52,6 @@ function IconLavazzaAmo() {
     </svg>
   );
 }
-function IconEspressoPoint() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9">
-      <ellipse cx="20" cy="20" rx="14" ry="10" stroke="#5C3A24" strokeWidth="2" fill="#F5F0E8" />
-      <ellipse cx="20" cy="20" rx="8" ry="5" fill="#C9A96E" opacity="0.4" />
-      <line x1="20" y1="15" x2="20" y2="25" stroke="#5C3A24" strokeWidth="1" opacity="0.3" />
-    </svg>
-  );
-}
 function IconGrani() {
   return (
     <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9">
@@ -134,7 +125,6 @@ const questions: Question[] = [
       { value: "cialde-44mm", label: "Cialde di carta 44mm", sub: "Frog, Didiesse, Grimac, Spinel e altre", icon: <IconCialda /> },
       { value: "capsule-nespresso", label: "Capsule Nespresso", sub: "Tutte le macchine Nespresso compatibili", icon: <IconNespresso /> },
       { value: "capsule-lavazza-amo", label: "Capsule Lavazza A Modo Mio", sub: "Jolie, Tiny, Voicy, Desea e altre", icon: <IconLavazzaAmo /> },
-      { value: "lavazza-espresso-point", label: "Lavazza Espresso Point", sub: "Matinée, EP Mini, EP 950 e altre", icon: <IconEspressoPoint /> },
       { value: "grani", label: "Grani", sub: "Per macchine con macinacaffè integrato", icon: <IconGrani /> },
       { value: "miscela-moka", label: "Miscela Moka", sub: "Per la classica moka da fornello", icon: <IconMoka /> },
     ],

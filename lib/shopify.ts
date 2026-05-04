@@ -20,7 +20,7 @@ export interface FunnelOffers {
   mesi3: FunnelProduct;
 }
 
-type FormatoKey = "cialde-44mm" | "capsule-nespresso" | "capsule-lavazza-amo" | "lavazza-espresso-point" | "grani" | "miscela-moka";
+type FormatoKey = "cialde-44mm" | "capsule-nespresso" | "capsule-lavazza-amo" | "grani" | "miscela-moka";
 type IntensitaKey = "leggero" | "medio" | "intenso";
 
 /* ─── Full product map ─── */
@@ -94,29 +94,6 @@ const productMap: Record<FormatoKey, Record<IntensitaKey, { miscela: string; ima
       mesi3: { variantId: "gid://shopify/ProductVariant/54008635195738", price: 185, quantity: "600 capsule" },
     },
   },
-  "lavazza-espresso-point": {
-    leggero: {
-      miscela: "Classica",
-      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5439-1000x1000.jpg?v=1712259095",
-      kit: { variantId: "gid://shopify/ProductVariant/54026885235034", price: 31.5, quantity: "100 capsule" },
-      mese1: { variantId: "gid://shopify/ProductVariant/54008646369626", price: 58, quantity: "200 capsule" },
-      mesi3: { variantId: "gid://shopify/ProductVariant/54008646467930", price: 162, quantity: "600 capsule" },
-    },
-    medio: {
-      miscela: "Gran Crema",
-      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5437-1000x1000.jpg?v=1712326367",
-      kit: { variantId: "gid://shopify/ProductVariant/54026885562714", price: 31.5, quantity: "100 capsule" },
-      mese1: { variantId: "gid://shopify/ProductVariant/54008646402394", price: 58, quantity: "200 capsule" },
-      mesi3: { variantId: "gid://shopify/ProductVariant/54008646500698", price: 162, quantity: "600 capsule" },
-    },
-    intenso: {
-      miscela: "Crema Oro",
-      image: "https://cdn.shopify.com/s/files/1/0767/9311/9066/files/LMS5440-1000x1000.jpg?v=1712326336",
-      kit: { variantId: "gid://shopify/ProductVariant/54026885661018", price: 31.5, quantity: "100 capsule" },
-      mese1: { variantId: "gid://shopify/ProductVariant/54008646435162", price: 58, quantity: "200 capsule" },
-      mesi3: { variantId: "gid://shopify/ProductVariant/54008646599002", price: 162, quantity: "600 capsule" },
-    },
-  },
   grani: {
     leggero: {
       miscela: "Gran Bar",
@@ -170,7 +147,6 @@ const formatNames: Record<FormatoKey, string> = {
   "cialde-44mm": "Cialde di Carta ESE44mm",
   "capsule-nespresso": "Capsule Nespresso",
   "capsule-lavazza-amo": "Capsule Lavazza A Modo Mio",
-  "lavazza-espresso-point": "Capsule Espresso Point",
   grani: "Caffè in Grani",
   "miscela-moka": "Macinato Moka",
 };
