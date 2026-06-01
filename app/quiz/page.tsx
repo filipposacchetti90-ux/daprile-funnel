@@ -20,7 +20,7 @@ interface Question {
   id: keyof QuizAnswer;
   label: string;
   subtitle: string;
-  options: { value: string; label: string; icon?: React.ReactNode; sub?: string }[];
+  options: { value: string; label: string; icon?: React.ReactNode; sub?: string; disabled?: boolean }[];
   hint?: (answers: Partial<QuizAnswer>) => string | null;
 }
 
@@ -123,7 +123,7 @@ const questions: Question[] = [
     subtitle: "Seleziona il formato compatibile con la tua macchina.",
     options: [
       { value: "cialde-44mm", label: "Cialde di carta 44mm", sub: "Frog, Didiesse, Grimac, Spinel e altre", icon: <IconCialda /> },
-      { value: "capsule-nespresso", label: "Capsule Nespresso", sub: "Tutte le macchine Nespresso compatibili", icon: <IconNespresso /> },
+      { value: "capsule-nespresso", label: "Capsule Nespresso", sub: "Temporaneamente esaurite", icon: <IconNespresso />, disabled: true },
       { value: "capsule-lavazza-amo", label: "Capsule Lavazza A Modo Mio", sub: "Jolie, Tiny, Voicy, Desea e altre", icon: <IconLavazzaAmo /> },
       { value: "grani", label: "Grani", sub: "Per macchine con macinacaffè integrato", icon: <IconGrani /> },
       { value: "miscela-moka", label: "Miscela Moka", sub: "Per la classica moka da fornello", icon: <IconMoka /> },
@@ -206,6 +206,7 @@ function OptionCard({
   selected,
   onClick,
   index,
+  disabled = false,
 }: {
   label: string;
   icon?: React.ReactNode;
@@ -213,33 +214,42 @@ function OptionCard({
   selected: boolean;
   onClick: () => void;
   index: number;
+  disabled?: boolean;
 }) {
   return (
     <motion.button
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06 }}
-      onClick={onClick}
-      className={`w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-300 cursor-pointer group ${
-        selected
-          ? "border-gold bg-white shadow-md shadow-gold/10"
-          : "border-coffee/10 bg-white/70 hover:border-coffee/20 hover:bg-white hover:shadow-sm"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
+      className={`w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-300 group ${
+        disabled
+          ? "border-coffee/5 bg-warm-gray/5 opacity-50 cursor-not-allowed"
+          : selected
+          ? "border-gold bg-white shadow-md shadow-gold/10 cursor-pointer"
+          : "border-coffee/10 bg-white/70 hover:border-coffee/20 hover:bg-white hover:shadow-sm cursor-pointer"
       }`}
     >
       <div className="flex items-center gap-3">
         {icon && (
-          <span className="flex-shrink-0">{icon}</span>
+          <span className={`flex-shrink-0 ${disabled ? "grayscale opacity-60" : ""}`}>{icon}</span>
         )}
         <div className="flex-1 min-w-0">
           <span
             className={`text-base md:text-lg uppercase tracking-wide transition-colors duration-300 block ${
-              selected ? "text-coffee-dark font-bold" : "text-coffee/70 font-medium group-hover:text-coffee-dark"
+              disabled
+                ? "text-coffee/40 font-medium line-through"
+                : selected
+                ? "text-coffee-dark font-bold"
+                : "text-coffee/70 font-medium group-hover:text-coffee-dark"
             }`}
           >
             {label}
           </span>
           {sub && (
-            <span className="text-xs text-warm-gray/60 block mt-0.5 normal-case tracking-normal">{sub}</span>
+            <span className={`text-xs block mt-0.5 normal-case tracking-normal ${disabled ? "text-coffee/50 italic font-semibold" : "text-warm-gray/60"}`}>{sub}</span>
           )}
         </div>
         {selected && (
@@ -375,6 +385,7 @@ export default function QuizPage() {
                     selected={currentAnswer === opt.value}
                     onClick={() => selectOption(opt.value)}
                     index={i}
+                    disabled={opt.disabled}
                   />
                 ))}
               </div>
