@@ -123,7 +123,7 @@ const questions: Question[] = [
     subtitle: "Seleziona il formato compatibile con la tua macchina.",
     options: [
       { value: "cialde-44mm", label: "Cialde di carta 44mm", sub: "Frog, Didiesse, Grimac, Spinel e altre", icon: <IconCialda /> },
-      { value: "capsule-nespresso", label: "Capsule Nespresso", sub: "Temporaneamente esaurite", icon: <IconNespresso />, disabled: true },
+      { value: "capsule-nespresso", label: "Capsule Nespresso", sub: "Pixie, Inissia, Citiz, Essenza e altre", icon: <IconNespresso /> },
       { value: "capsule-lavazza-amo", label: "Capsule Lavazza A Modo Mio", sub: "Jolie, Tiny, Voicy, Desea e altre", icon: <IconLavazzaAmo /> },
       { value: "grani", label: "Grani", sub: "Per macchine con macinacaffè integrato", icon: <IconGrani /> },
       { value: "miscela-moka", label: "Miscela Moka", sub: "Per la classica moka da fornello", icon: <IconMoka /> },
