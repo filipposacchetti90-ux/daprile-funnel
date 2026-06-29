@@ -4,7 +4,7 @@ import { createCart } from "../../../lib/shopify";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { variantId, email, shipping } = body;
+    const { variantId, email, shipping, tracking } = body;
 
     if (!variantId || !email || !shipping) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       province: shipping.province,
       zip: shipping.cap,
       phone: shipping.phone,
-    });
+    }, tracking);
 
     return NextResponse.json({
       success: true,

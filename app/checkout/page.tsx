@@ -7,7 +7,7 @@ import OrderNotifications from "../../components/OrderNotifications";
 import CheckoutTimer from "../../components/CheckoutTimer";
 import TrustSignals from "../../components/TrustSignals";
 import BrandQuotes from "../../components/BrandQuotes";
-import { trackInitiateCheckout, trackAddToCart, initPixel } from "../../lib/pixel";
+import { trackInitiateCheckout, trackAddToCart, initPixel, getTracking } from "../../lib/pixel";
 import { getOffersForQuiz, type FunnelProduct } from "../../lib/shopify";
 
 /* ─── Icons ─── */
@@ -171,6 +171,9 @@ export default function CheckoutPage() {
             cap: form.cap,
             phone: form.phone,
           },
+          // Meta click identifiers → stored on the Shopify order → used by the
+          // server-side Purchase CAPI event for campaign attribution.
+          tracking: getTracking(),
         }),
       });
       const data = await res.json();

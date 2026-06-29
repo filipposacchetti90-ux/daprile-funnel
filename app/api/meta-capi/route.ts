@@ -36,6 +36,12 @@ export async function POST(request: NextRequest) {
     const shipping = order.shipping_address || order.customer?.default_address || {};
     const lineItems = (order.line_items || []) as Array<{ title: string; quantity: number; variant_id: number }>;
 
+    // Meta attribution: the click identifiers we stored on the cart (lib/shopify.ts)
+    // arrive here as note_attributes. Without fbc/fbp Meta can't tie the Purchase to
+    // the originating ad — which is why conversions were tracked but not attributed.
+    const getAttr = (name: string) => attrs.find((a) => a.name === name)?.value || null;
+    const clientDetails = order.client_details || {};
+
     const result = await sendCapiEvent({
       eventName: "Purchase",
       eventId: String(order.id),
@@ -49,6 +55,10 @@ export async function POST(request: NextRequest) {
         city: shipping.city,
         zip: shipping.zip,
         country: shipping.country_code,
+        fbp: getAttr("_fbp"),
+        fbc: getAttr("_fbc"),
+        clientIp: clientDetails.browser_ip,
+        userAgent: clientDetails.user_agent,
       },
       customData: {
         value: parseFloat(order.total_price || order.current_total_price || "0"),

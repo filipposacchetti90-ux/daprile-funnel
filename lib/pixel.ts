@@ -44,6 +44,13 @@ export function newEventId(): string {
   return `ev-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+/* Read Meta click identifiers to forward into the Shopify order (server-side CAPI attribution).
+   _fbp is set by fbevents.js; _fbc is set by captureFbc() from the ?fbclid= on the ad landing. */
+export function getTracking(): { fbp: string | null; fbc: string | null; fbclid: string | null } {
+  const fbclid = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("fbclid") : null;
+  return { fbp: getCookie("_fbp"), fbc: getCookie("_fbc"), fbclid };
+}
+
 /* ─── Initialize pixel with optional Advanced Matching (called once in layout) ─── */
 export function initPixel(advancedMatching?: { em?: string; ph?: string; fn?: string; ln?: string }) {
   if (typeof window === "undefined") return;

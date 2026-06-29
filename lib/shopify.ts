@@ -284,7 +284,15 @@ export async function createCart(variantId: string, email: string, shippingAddre
   province: string;
   zip: string;
   phone: string;
-}) {
+}, tracking?: { fbp?: string | null; fbc?: string | null; fbclid?: string | null }) {
+  // Meta attribution: carry the click identifiers captured on the landing into the
+  // Shopify order (as note_attributes) so the server-side Purchase CAPI event can
+  // include fbp/fbc and Meta can attribute the conversion to the originating ad.
+  const attributes: Array<{ key: string; value: string }> = [{ key: "source", value: "funnel" }];
+  if (tracking?.fbp) attributes.push({ key: "_fbp", value: tracking.fbp });
+  if (tracking?.fbc) attributes.push({ key: "_fbc", value: tracking.fbc });
+  if (tracking?.fbclid) attributes.push({ key: "_fbclid", value: tracking.fbclid });
+
   const result = await storefrontFetch(`
     mutation cartCreate($input: CartInput!) {
       cartCreate(input: $input) {
@@ -300,7 +308,7 @@ export async function createCart(variantId: string, email: string, shippingAddre
   `, {
     input: {
       lines: [{ merchandiseId: variantId, quantity: 1 }],
-      attributes: [{ key: "source", value: "funnel" }],
+      attributes,
       buyerIdentity: {
         email,
         phone: shippingAddress.phone,
